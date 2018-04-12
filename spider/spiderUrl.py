@@ -1,13 +1,13 @@
+'''
+参考网络资源地址
+https://www.toutiao.com/i6543111579162903053/?tt_from=weixin&utm_campaign=client_share&from=singlemessage&timestamp=1523499165&app=news_article&utm_source=weixin&isappinstalled=0&iid=30195832091&utm_medium=toutiao_ios&wxshare_count=2&pbid=6543379310681589261
+'''
 import os
 import requests
 from lxml import html
 import time
-
 from selenium import webdriver
-
 etree = html.etree
-
-
 
 # 将Chrome设置成不加载图片的无界面运行状态
 chrome_options = webdriver.ChromeOptions()
@@ -16,8 +16,8 @@ chrome_options.add_experimental_option("prefs", prefs)
 chrome_options.add_argument("--headless")
 # chromedriver与chrome版本映射表  https://blog.csdn.net/huilan_same/article/details/51896672
 #将 chromedriver.exe 放到python安装路径下
+# 修改为自己的实际路径
 chrome_path = 'D:\install\python3\chromedriver.exe'
-
 os.environ["webriver.chrome.driver"]=chrome_path
 # 设置图片存储路径
 PICTURES_PATH = os.path.join(os.getcwd(), 'pictures/')
@@ -104,7 +104,6 @@ class Spider(object):
 
 # main函数
 if __name__ == '__main__':
-    # page_num = input("请输入页码：")
-    page_num = 1
+    page_num = input("请输入页码：")
     mmjpg_spider = Spider(page_num)
     mmjpg_spider.start()
