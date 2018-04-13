@@ -1,17 +1,16 @@
 '''
 说明：
 运行方式，切换到本地文件，打开命令窗口，执行下面的命令：
-
+实楼网址： https://www.shiyanlou.com/courses/running
 python ascii.py ascii_dora.png
-
 '''
 
 #-*- coding:utf-8 -*-
 
-# pip install pillow
+#安装PIL模块  pip install pillow
 from PIL import Image
 import argparse
-## 实楼 https://www.shiyanlou.com/courses/running
+
 #命令行输入参数处理
 parser = argparse.ArgumentParser()
 
