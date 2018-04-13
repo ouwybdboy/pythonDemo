@@ -2,7 +2,7 @@
 200行Python代码实现2048
 实楼网址： https://www.shiyanlou.com/courses/running
 运行方式，切换到本地文件，打开命令窗口，执行下面的命令：
-python game2048.py
+> python game2048.py
 
 '''
 #-*- coding:utf-8 -*-
@@ -12,31 +12,43 @@ from random import randrange, choice
 # generate and place new tile
 from collections import defaultdict
 
+#有效输入键是最常见的 W（上），A（左），S（下），D（右），R（重置），Q（退出），这里要考虑到大写键开启的情况，获得有效键值列表：
 letter_codes = [ord(ch) for ch in 'WASDRQwasdrq']
+#所有的有效输入都可以转换为"上，下，左，右，游戏重置，退出"这六种行为，用 actions 表示
 actions = ['Up', 'Left', 'Down', 'Right', 'Restart', 'Exit']
+#将输入与行为进行关联
 actions_dict = dict(zip(letter_codes, actions * 2))
 
+#用户输入处理:阻塞＋循环，直到获得用户有效输入才返回对应行为
 def get_user_action(keyboard):    
     char = "N"
     while char not in actions_dict:    
         char = keyboard.getch()
     return actions_dict[char]
 
+#矩阵转置与矩阵逆转
+# 加入这两个操作可以大大节省我们的代码量，减少重复劳动，看到后面就知道了。
+
+# 矩阵转置
 def transpose(field):
     return [list(row) for row in zip(*field)]
 
+# 矩阵逆转（不是逆矩阵）
 def invert(field):
     return [row[::-1] for row in field]
 
+#创建棋盘
+# 初始化棋盘的参数，可以指定棋盘的高和宽以及游戏胜利条件，默认是最经典的 4x4～2048
 class GameField(object):
     def __init__(self, height=4, width=4, win=2048):
-        self.height = height
-        self.width = width
-        self.win_value = win
-        self.score = 0
-        self.highscore = 0
-        self.reset()
+        self.height = height  # 高
+        self.width = width  # 宽
+        self.win_value = 2048  # 过关分数
+        self.score = 0  # 当前分数
+        self.highscore = 0  # 最高分
+        self.reset()  # 棋盘重置
 
+    # 重置棋盘
     def reset(self):
         if self.score > self.highscore:
             self.highscore = self.score
@@ -45,14 +57,16 @@ class GameField(object):
         self.spawn()
         self.spawn()
 
+    # 棋盘走一步：通过对矩阵进行转置与逆转，可以直接从左移得到其余三个方向的移动操作
     def move(self, direction):
+        # 一行向左合并：(注：这一操作是在 move 内定义的，拆出来是为了方便阅读)
         def move_row_left(row):
-            def tighten(row): # squeese non-zero elements together
+            def tighten(row): # 把零散的非零单元挤到一块
                 new_row = [i for i in row if i != 0]
                 new_row += [0 for i in range(len(row) - len(new_row))]
                 return new_row
 
-            def merge(row):
+            def merge(row):# 对邻近元素进行合并
                 pair = False
                 new_row = []
                 for i in range(len(row)):
@@ -68,7 +82,7 @@ class GameField(object):
                             new_row.append(row[i])
                 assert len(new_row) == len(row)
                 return new_row
-            return tighten(merge(tighten(row)))
+            return tighten(merge(tighten(row)))#先挤到一块再合并再挤到一块
 
         moves = {}
         moves['Left']  = lambda field:                              \
@@ -88,12 +102,14 @@ class GameField(object):
             else:
                 return False
 
+    # 判断输赢
     def is_win(self):
         return any(any(i >= self.win_value for i in row) for row in self.field)
 
     def is_gameover(self):
         return not any(self.move_is_possible(move) for move in actions)
 
+    # 绘制游戏界面
     def draw(self, screen):
         help_string1 = '(W)Up (S)Down (A)Left (D)Right'
         help_string2 = '     (R)Restart (Q)Exit'
@@ -102,6 +118,7 @@ class GameField(object):
         def cast(string):
             screen.addstr(string + '\n')
 
+        # 绘制水平分割线
         def draw_hor_separator():
             line = '+' + ('+------' * self.width + '+')[1:]
             separator = defaultdict(lambda: line)
@@ -130,17 +147,19 @@ class GameField(object):
                 cast(help_string1)
         cast(help_string2)
 
+    # 棋盘操作： 随机生成一个 2 或者 4
     def spawn(self):
         new_element = 4 if randrange(100) > 89 else 2
         (i,j) = choice([(i,j) for i in range(self.width) for j in range(self.height) if self.field[i][j] == 0])
         self.field[i][j] = new_element
 
+    # 判断能否移动
     def move_is_possible(self, direction):
         def row_is_left_movable(row): 
             def change(i): # true if there'll be change in i-th tile
-                if row[i] == 0 and row[i + 1] != 0: # Move
+                if row[i] == 0 and row[i + 1] != 0: # 可以移动
                     return True
-                if row[i] != 0 and row[i + 1] == row[i]: # Merge
+                if row[i] != 0 and row[i + 1] == row[i]: # 可以合并
                     return True
                 return False
             return any(change(i) for i in range(len(row) - 1))
@@ -162,7 +181,7 @@ class GameField(object):
             return check[direction](self.field)
         else:
             return False
-
+#主逻辑的代码
 def main(stdscr):
     def init():
         #重置游戏棋盘

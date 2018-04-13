@@ -2,7 +2,7 @@
 说明：
 实楼网址： https://www.shiyanlou.com/courses/running
 运行方式，切换到本地文件，打开命令窗口，执行下面的命令：
-python ascii.py ascii_dora.png
+> python ascii.py ascii_dora.png
 '''
 
 #-*- coding:utf-8 -*-
