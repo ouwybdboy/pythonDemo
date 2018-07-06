@@ -17,15 +17,16 @@ chrome_options.add_argument("--headless")
 # chromedriver与chrome版本映射表  https://blog.csdn.net/huilan_same/article/details/51896672
 #将 chromedriver.exe 放到python安装路径下
 # 修改为自己的实际路径
-chrome_path = 'D:\install\python3\chromedriver.exe'
+# chrome_path = 'D:\install\python3\chromedriver.exe'
+chrome_path = 'D:\chromedriver.exe'
 os.environ["webriver.chrome.driver"]=chrome_path
 # 设置图片存储路径
 PICTURES_PATH = os.path.join(os.getcwd(), 'pictures/')
 
 # 设置headers
 headers = {
-    'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/60.0.3112.101 Safari/537.36',
-    'Refere': "http://www.mmjpg.com"
+    'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/65.0.3325.181 Safari/537.36',
+    'Refere': "http://www.mmjpg.com/"
 }
 
 
@@ -49,7 +50,7 @@ class Spider(object):
     # 获取妹子url的方法
     def get_girl_urls(self):
         for page_url in self.page_urls:
-            html = requests.get(page_url).content
+            html  = requests.get(page_url).content
             selector = etree.HTML(html)
             self.girl_urls += (selector.xpath('//span[@class="title"]/a/@href'))
 
@@ -58,9 +59,9 @@ class Spider(object):
         driver = webdriver.Chrome(chrome_path, chrome_options=chrome_options)
         for girl_url in self.girl_urls:
             driver.get(girl_url)
-            time.sleep(3)
+            time.sleep(4)
             driver.find_element_by_xpath('//em[@class="ch all"]').click()
-            time.sleep(3)
+            time.sleep(4)
             html = driver.page_source
             selector = etree.HTML(html)
             self.girl_name = selector.xpath('//div[@class="article"]/h2/text()')[0]
@@ -104,6 +105,7 @@ class Spider(object):
 
 # main函数
 if __name__ == '__main__':
-    page_num = input("请输入页码：")
+    # page_num = input("请输入页码：")
+    page_num = 2
     mmjpg_spider = Spider(page_num)
     mmjpg_spider.start()
